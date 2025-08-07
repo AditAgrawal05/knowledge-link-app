@@ -1,46 +1,34 @@
-# --- Stage 1: Build the Next.js frontend ---
-FROM node:20-slim AS frontend-builder
-WORKDIR /app
-
-# Copy package files to the frontend subdirectory
-COPY frontend/package*.json ./frontend/
-
-# Set the working directory to the frontend folder and install dependencies
-WORKDIR /app/frontend
-RUN npm install
-
-# Copy the rest of the frontend source code
-COPY frontend/ .
-
-# Run the build, which creates the 'out' folder inside /app/frontend
-RUN npm run build
-
-
-# --- Stage 2: Create the final production image ---
+# Start with a base image that has Python
 FROM python:3.11-slim
 
-# Install Node.js and npm for the Next.js production server
-RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
+# Set the working directory inside the container
+ENV APP_HOME=/app
+WORKDIR $APP_HOME
 
-WORKDIR /app
+# Install Node.js (which includes npm)
+RUN apt-get update && apt-get install -y nodejs npm
 
-# Copy Python backend and install dependencies
-COPY backend/requirements.txt .
+# Copy all your project files into the container
+COPY . .
+
+# --- Install Backend Dependencies ---
+WORKDIR $APP_HOME/backend
 RUN pip install --no-cache-dir -r requirements.txt
-COPY ./backend ./backend
 
-# Copy the Next.js app with its production dependencies
-COPY --from=frontend-builder /app/frontend /app/frontend
+# --- Install Frontend Dependencies & Build ---
+WORKDIR $APP_HOME/frontend
+RUN npm install
+RUN npm run build
 
-# Copy the start script and make it executable
-COPY start.sh .
-RUN chmod +x start.sh
+# --- Final Setup ---
+# Set the main working directory
+WORKDIR $APP_HOME
+
+# Make the start script executable
+RUN chmod +x ./start.sh
 
 # Expose the port Next.js runs on
 EXPOSE 3000
 
-# Command to run our start script
+# The command to run our start script
 CMD ["./start.sh"]
