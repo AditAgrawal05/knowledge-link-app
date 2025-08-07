@@ -124,7 +124,7 @@ export default function Home() {
           
           {links.length === 0 && searchResults.length === 0 && !searchQuery && (
             <div className="text-center py-10 px-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">You haven't saved any links yet.</p>
+                <p className="text-gray-500">You haven&apos;t saved any links yet.</p>
                 <p className="text-gray-400 text-sm">Paste a URL above to get started!</p>
             </div>
           )}
