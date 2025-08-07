@@ -19,7 +19,7 @@ load_dotenv()
 app = FastAPI(title="KnowledgeLink API")
 
 # This line tells FastAPI to serve the static Next.js files
-app.mount("/", StaticFiles(directory="/app/frontend/out", html=True), name="static")
+app.mount("/", StaticFiles(directory="/app/static", html=True), name="static")
 
 # Configure Google Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))

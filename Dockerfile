@@ -22,14 +22,20 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ./backend ./backend
 
-# Copy the entire built Next.js app from the first stage
+# Copy the Next.js production dependencies (node_modules)
+COPY --from=frontend-builder /app/node_modules /app/frontend/node_modules
+# Copy the rest of the Next.js app
 COPY --from=frontend-builder /app /app/frontend
+
+# --- THIS IS THE KEY CHANGE ---
+# Copy the *built static files* from the 'out' folder to a new '/app/static' folder
+COPY --from=frontend-builder /app/out /app/static
 
 # Copy and prepare the start script
 COPY start.sh .
 RUN chmod +x start.sh
 
-# Expose the port Next.js runs on (default is 3000)
+# Expose the port Next.js runs on
 EXPOSE 3000
 
 # Command to run our start script
