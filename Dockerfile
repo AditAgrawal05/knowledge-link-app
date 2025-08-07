@@ -14,6 +14,6 @@ ENV PYTHONUNBUFFERED 1
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ./backend .
-COPY --from=frontend-builder /app/frontend/.next ./static
+COPY --from=frontend-builder /app/frontend/out ./static
 EXPOSE 8000
 CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
