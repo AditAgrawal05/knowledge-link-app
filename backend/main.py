@@ -103,9 +103,9 @@ async def get_summary_and_embedding(content: str):
         return None, None
 
 # --- API Endpoints ---
-@app.get("/")
-def read_root():
-    return {"status": "KnowledgeLink API is running!"}
+# @app.get("/")
+# def read_root():
+#     return {"status": "KnowledgeLink API is running!"}
 
 @app.post("/api/links", status_code=201)
 async def add_link(link_submission: LinkSubmission):
