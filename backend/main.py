@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from typing import List
-from fastapi.staticfiles import StaticFiles
+# from fastapi.staticfiles import StaticFiles
 
 # Load environment variables from .env file
 load_dotenv()
@@ -19,7 +19,7 @@ load_dotenv()
 app = FastAPI(title="KnowledgeLink API")
 
 # This line tells FastAPI to serve the static Next.js files
-app.mount("/", StaticFiles(directory="/app/static", html=True), name="static")
+# app.mount("/", StaticFiles(directory="/app/static", html=True), name="static")
 
 # Configure Google Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
