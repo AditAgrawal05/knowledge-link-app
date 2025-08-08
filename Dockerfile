@@ -1,34 +1,37 @@
-# Start with a base image that has Python
-FROM python:3.11-slim
+# Dockerfile
 
-# Set the working directory inside the container
-ENV APP_HOME=/app
-WORKDIR $APP_HOME
-
-# Install Node.js (which includes npm)
-RUN apt-get update && apt-get install -y nodejs npm
-
-# Copy all your project files into the container
-COPY . .
-
-# --- Install Backend Dependencies ---
-WORKDIR $APP_HOME/backend
+# --- Stage 1: Build the backend base ---
+FROM python:3.11-slim AS python-base
+WORKDIR /app/backend
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+COPY backend/ .
 
-# --- Install Frontend Dependencies & Build ---
-WORKDIR $APP_HOME/frontend
+# --- Stage 2: Build the frontend ---
+FROM node:20-slim AS frontend-builder
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
 RUN npm install
+COPY frontend/ .
 RUN npm run build
 
-# --- Final Setup ---
-# Set the main working directory
-WORKDIR $APP_HOME
+# --- Final Stage: Production image ---
+FROM node:20-slim
+WORKDIR /app
 
-# Make the start script executable
+# Install Python runtime
+RUN apt-get update && apt-get install -y python3-pip
+
+# Copy Python app and its installed dependencies from the backend base
+COPY --from=python-base /app/backend /app/backend
+COPY --from=python-base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+
+# Copy the built Next.js app from the frontend builder stage
+COPY --from=frontend-builder /app/frontend /app/frontend
+
+# Copy start script and make it executable
+COPY start.sh .
 RUN chmod +x ./start.sh
 
-# Expose the port Next.js runs on
 EXPOSE 3000
-
-# The command to run our start script
 CMD ["./start.sh"]
