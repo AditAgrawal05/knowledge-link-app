@@ -17,15 +17,18 @@ FROM node:20-slim
 WORKDIR /app
 
 # --- THIS IS THE KEY FIX ---
-# Copy the *entire working Python installation* (interpreter, pip, packages)
-# from the python-base stage into the final image.
+# Install the missing OpenSSL system library (libssl3)
+RUN apt-get update && apt-get install -y libssl3
+
+# Copy the entire working Python installation (interpreter, pip, packages)
+# from the python-base stage.
 COPY --from=python-base /usr/local /usr/local
 
 # Copy the built Next.js app from the frontend builder stage
 COPY --from=frontend-builder /app /app/frontend
 
 # Copy the Python source code from the python-base stage
-COPY --from=python-base /app/backend /app/backend
+COPY --from-python-base /app/backend /app/backend
 
 # Copy start script and make it executable
 COPY start.sh .
