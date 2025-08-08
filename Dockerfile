@@ -4,7 +4,9 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
-RUN npm run build
+# --- THIS IS THE FIX ---
+# Run the build command using its direct path to be more explicit
+RUN ./node_modules/.bin/next build
 
 # Stage 2: Prepare the Python environment
 FROM python:3.11-slim AS python-base
