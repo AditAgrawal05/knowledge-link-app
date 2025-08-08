@@ -19,16 +19,14 @@ WORKDIR /app
 # Install the missing OpenSSL system library (libssl3)
 RUN apt-get update && apt-get install -y libssl3
 
-# Copy the entire working Python installation (interpreter, pip, packages)
-# from the python-base stage.
+# Copy the entire working Python installation
 COPY --from=python-base /usr/local /usr/local
 
-# Copy the built Next.js app from the frontend builder stage
+# Copy the built Next.js app
 COPY --from=frontend-builder /app /app/frontend
 
-# --- THIS IS THE CORRECTED LINE ---
-# Copy the Python source code from the python-base stage
-COPY --from python-base /app/backend /app/backend
+# Copy the Python source code
+COPY --from=python-base /app/backend /app/backend
 
 # Copy start script and make it executable
 COPY start.sh .
